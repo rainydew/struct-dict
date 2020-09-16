@@ -1,0 +1,44 @@
+# coding: utf-8
+class _StructList(list):
+    def __init__(self, seq=()):
+        super().__init__(seq)
+        for i, v in enumerate(self):
+            if type(v) == list:
+                self[i] = _StructList(v)
+            elif type(v) == dict:
+                self[i] = _StructDict(v)
+
+
+class _StructDict(dict):
+    def __init__(self, seq=None, **kwargs):
+        super().__init__(seq, **kwargs)
+        for k, v in self.items():
+            if type(v) == dict:
+                self[k] = _StructDict(v)
+            elif type(v) == list:
+                self[k] = _StructList(v)
+
+    def __getattr__(self, item):
+        return self[item]
+
+
+class StructType:
+    def __new__(cls, v):
+        if type(v) == dict:
+            return _StructDict(v)
+        elif type(v) in (list, tuple):
+            return _StructList(v)
+        else:
+            return v
+            
+            
+if __name__ == '__main__':
+    p = StructType({
+        "a": [{
+            "b":{
+                "c": 1
+            }
+        }]
+    })
+    
+    print(p.a[0].b.c)
