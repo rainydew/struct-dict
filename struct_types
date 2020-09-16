@@ -21,6 +21,12 @@ class _StructDict(dict):
     def __getattr__(self, item):
         return self[item]
 
+    def __setattr__(self, key, value):
+        if key not in self.__dict__.keys():
+            self[key] = value
+        else:
+            self.__dict__[key] = value
+
 
 class StructType:
     def __new__(cls, v):
@@ -42,3 +48,9 @@ if __name__ == '__main__':
     })
     
     print(p.a[0].b.c)
+    
+    p.a[0].b.c = 2
+    p.a[0].b.d = 3
+
+    print(p.a[0].b)
+
